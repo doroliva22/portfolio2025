@@ -1,8 +1,23 @@
-// src/components/ContactSection.jsx
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+
 export const ContactSection = () => {
+    const [showArrow, setShowArrow] = useState(false);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 200) setShowArrow(true);
+            else setShowArrow(false);
+            setLastScrollY(window.scrollY);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
+
     return (
         <section
-            id="contact"
+            id="contacto"
             className="min-h-screen bg-gradient-to-b from-black to-violet-950 flex flex-col items-center justify-center text-center px-6"
         >
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
@@ -32,8 +47,18 @@ export const ContactSection = () => {
                 </a>
             </div>
 
+            {/* Flecha volver arriba */}
+            {showArrow && (
+                <motion.div
+                    initial={{ y: -100 }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="fixed bottom-8 right-8 backdrop-blur-md bg-white/5 border border-white/20 rounded-2xl shadow-lg shadow-violet-900/20 px-4 py-3 cursor-pointer text-gray-200 hover:text-violet-400"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                    ↑
+                </motion.div>
+            )}
         </section>
     );
 };
-
-export default ContactSection;

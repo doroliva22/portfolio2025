@@ -1,12 +1,15 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SlShareAlt } from "react-icons/sl";
+import { motion } from "framer-motion";
 
 export const ProjectsSection = () => {
     const sectionRef = useRef(null);
     const titleRef = useRef(null);
     const titleLineRef = useRef(null);
+    const [showArrow, setShowArrow] = useState(false);
+    const [lastScrollY, setLastScrollY] = useState(0);
 
     const projectImages = [
         {
@@ -25,7 +28,7 @@ export const ProjectsSection = () => {
             id: 3,
             title: "Sistema de Entradas por QR",
             imageSrc: "/images/proyectoC.png",
-            link: null, // sin ícono ni enlace
+            link: null,
         },
     ];
 
@@ -86,10 +89,20 @@ export const ProjectsSection = () => {
         });
     }, []);
 
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 200) setShowArrow(true);
+            else setShowArrow(false);
+            setLastScrollY(window.scrollY);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
+
     return (
         <section
             ref={sectionRef}
-            id="projects"
+            id="proyectos"
             className="relative py-20 bg-[#f6f6f6] overflow-hidden"
         >
             {/* 🔹 Título */}
@@ -139,6 +152,19 @@ export const ProjectsSection = () => {
                     </div>
                 ))}
             </div>
+
+            {/* Flecha volver arriba */}
+            {showArrow && (
+                <motion.div
+                    initial={{ y: -100 }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="fixed bottom-8 right-8 backdrop-blur-md bg-white/5 border border-white/20 rounded-2xl shadow-lg shadow-violet-900/20 px-4 py-3 cursor-pointer text-gray-200 hover:text-violet-400"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                    ↑
+                </motion.div>
+            )}
         </section>
     );
 };

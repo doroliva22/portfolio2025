@@ -1,18 +1,20 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion } from "framer-motion";
 
 export const AboutSection = () => {
     const sectionRef = useRef(null);
     const titleRef = useRef(null);
     const introRef = useRef(null);
     const starsRef = useRef([]);
+    const [showArrow, setShowArrow] = useState(false);
+    const [lastScrollY, setLastScrollY] = useState(0);
 
     useEffect(() => {
         gsap.registerPlugin(ScrollTrigger);
 
         const ctx = gsap.context(() => {
-            // === Animate Title ===
             gsap.fromTo(
                 titleRef.current,
                 { y: 80, opacity: 0 },
@@ -29,7 +31,6 @@ export const AboutSection = () => {
                 }
             );
 
-            // === Animate Text + Image ===
             gsap.fromTo(
                 introRef.current,
                 { y: 80, opacity: 0, filter: "blur(10px)" },
@@ -47,13 +48,10 @@ export const AboutSection = () => {
                 }
             );
 
-            // === Animate Stars ===
             starsRef.current.forEach((star, index) => {
                 if (!star) return;
-
                 const direction = index % 2 === 0 ? 1 : -1;
                 const speed = 0.5 + Math.random() * 0.5;
-
                 gsap.to(star, {
                     x: direction * (40 + index * 15),
                     y: direction * (-25 + index * 10),
@@ -76,10 +74,20 @@ export const AboutSection = () => {
         };
     }, []);
 
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 200) setShowArrow(true);
+            else setShowArrow(false);
+            setLastScrollY(window.scrollY);
+        };
+        window.addEventListener("scroll", handleScroll);
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, [lastScrollY]);
+
     return (
         <section
             ref={sectionRef}
-            id="about"
+            id="sobre-mi"
             className="relative min-h-screen bg-gradient-to-b from-black to-[#9a74cf50] overflow-hidden"
         >
             {/* Floating Stars */}
@@ -135,14 +143,27 @@ export const AboutSection = () => {
                     src="images/sinfondobien.png"
                     alt="Salvador Oliva - Frontend Developer"
                     className="lg:h-[26rem] md:h-[20rem] h-[15rem] 
-             mix-blend-screen opacity-90 
-             mt-10 md:mt-0 
-             rounded-2xl border border-violet-300/10 
-             shadow-[0_0_30px_rgba(147,51,234,0.3)] 
-             transition-all duration-700 ease-in-out 
-             hover:opacity-100 hover:scale-105"
+           mix-blend-screen opacity-90 
+           mt-10 md:mt-0 
+           rounded-2xl border border-violet-300/10 
+           shadow-[0_0_30px_rgba(147,51,234,0.3)] 
+           transition-all duration-700 ease-in-out 
+           hover:opacity-100 hover:scale-105"
                 />
             </div>
+
+            {/* Flecha volver arriba */}
+            {showArrow && (
+                <motion.div
+                    initial={{ y: -100 }}
+                    animate={{ y: 0 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="fixed bottom-8 right-8 backdrop-blur-md bg-white/5 border border-white/20 rounded-2xl shadow-lg shadow-violet-900/20 px-4 py-3 cursor-pointer text-gray-200 hover:text-violet-400"
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                >
+                    ↑
+                </motion.div>
+            )}
         </section>
     );
 };

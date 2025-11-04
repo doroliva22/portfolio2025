@@ -16,12 +16,10 @@ function App() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Refrescar triggers (por si se usan dentro de secciones individuales)
-    ScrollTrigger.refresh();
+    // Refrescar triggers después de que todo cargue (imágenes incluidas)
+    window.addEventListener("load", ScrollTrigger.refresh);
 
-    return () => {
-      ScrollTrigger.getAll().forEach((t) => t.kill());
-    };
+    return () => window.removeEventListener("load", ScrollTrigger.refresh);
   }, []);
 
   return (
