@@ -8,6 +8,7 @@ import {
     FiMenu,
     FiX,
 } from "react-icons/fi";
+import { useLanguage } from "../context/LanguageContext";
 
 const Header = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -15,13 +16,15 @@ const Header = () => {
     const [lastScrollY, setLastScrollY] = useState(0);
     const [activeSection, setActiveSection] = useState("sobre-mi");
 
+    // 🔥 Idioma global desde el contexto
+    const { language, setLanguage } = useLanguage();
+
     const toggleMenu = () => setIsOpen(!isOpen);
 
-    // Ocultar header al hacer scroll hacia abajo
+    // Ocultar header al hacer scroll
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > lastScrollY) setShowHeader(false);
-            else setShowHeader(true);
+            setShowHeader(window.scrollY <= lastScrollY);
             setLastScrollY(window.scrollY);
         };
         window.addEventListener("scroll", handleScroll);
@@ -47,9 +50,7 @@ const Header = () => {
             if (!section) return;
 
             const observer = new IntersectionObserver(
-                ([entry]) => {
-                    if (entry.isIntersecting) setActiveSection(id);
-                },
+                ([entry]) => entry.isIntersecting && setActiveSection(id),
                 { threshold: 0.6 }
             );
 
@@ -60,10 +61,23 @@ const Header = () => {
         return () => observers.forEach((obs) => obs.disconnect());
     }, []);
 
-    // Clase para enlaces
+    // Clases de navegación
     const linkClass = (id) =>
-        `cursor-pointer text-gray-200 hover:text-violet-400 transition-colors ${activeSection === id ? "underline underline-offset-4 font-semibold" : ""
-        }`;
+        `cursor-pointer text-gray-200 hover:text-violet-400 transition-colors`;
+
+    // Diccionario traducido
+    const t = {
+        es: {
+            about: "Sobre mí",
+            projects: "Proyectos",
+            contact: "Contacto",
+        },
+        en: {
+            about: "About me",
+            projects: "Projects",
+            contact: "Contact",
+        },
+    };
 
     return (
         <motion.header
@@ -76,16 +90,49 @@ const Header = () => {
                 className="backdrop-blur-md bg-white/5 border border-white/20 rounded-2xl shadow-lg shadow-violet-900/20 
                 flex items-center justify-center px-8 py-4 space-x-8"
             >
+                {/* 🔥 LANGUAGE SWITCH GLOBAL */}
+                <div className="flex items-center bg-white/10 border border-white/20 rounded-full px-1 py-1 select-none">
+                    <button
+                        onClick={() => setLanguage("es")}
+                        className={`relative w-14 text-center text-xs font-semibold transition-colors ${language === "es" ? "text-black" : "text-gray-300"
+                            }`}
+                    >
+                        {language === "es" && (
+                            <motion.div
+                                layoutId="langSwitch"
+                                className="absolute inset-0 rounded-full bg-violet-400"
+                                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                            />
+                        )}
+                        <span className="relative z-10">SPA</span>
+                    </button>
+
+                    <button
+                        onClick={() => setLanguage("en")}
+                        className={`relative w-14 text-center text-xs font-semibold transition-colors ${language === "en" ? "text-black" : "text-gray-300"
+                            }`}
+                    >
+                        {language === "en" && (
+                            <motion.div
+                                layoutId="langSwitch"
+                                className="absolute inset-0 rounded-full bg-violet-400"
+                                transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                            />
+                        )}
+                        <span className="relative z-10">ENG</span>
+                    </button>
+                </div>
+
                 {/* Navegación */}
                 <nav className="hidden md:flex space-x-6 text-sm uppercase tracking-wide">
                     <span onClick={() => scrollToSection("sobre-mi")} className={linkClass("sobre-mi")}>
-                        Sobre mí
+                        {t[language].about}
                     </span>
                     <span onClick={() => scrollToSection("proyectos")} className={linkClass("proyectos")}>
-                        Proyectos
+                        {t[language].projects}
                     </span>
                     <span onClick={() => scrollToSection("contacto")} className={linkClass("contacto")}>
-                        Contacto
+                        {t[language].contact}
                     </span>
                 </nav>
 
@@ -109,7 +156,7 @@ const Header = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ delay: 0.3 + i * 0.1, duration: 0.6 }}
                         href={item.href}
-                        target={item.href.startsWith("http") ? "_blank" : undefined}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-gray-200 hover:text-violet-400 transition-colors"
                     >
@@ -133,13 +180,13 @@ const Header = () => {
                     className="absolute top-20 left-0 w-full bg-black/80 backdrop-blur-md p-6 flex flex-col items-center space-y-4"
                 >
                     <span onClick={() => scrollToSection("sobre-mi")} className={linkClass("sobre-mi")}>
-                        Sobre mí
+                        {t[language].about}
                     </span>
                     <span onClick={() => scrollToSection("proyectos")} className={linkClass("proyectos")}>
-                        Proyectos
+                        {t[language].projects}
                     </span>
                     <span onClick={() => scrollToSection("contacto")} className={linkClass("contacto")}>
-                        Contacto
+                        {t[language].contact}
                     </span>
                 </motion.div>
             )}

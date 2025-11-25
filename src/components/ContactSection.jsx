@@ -1,9 +1,28 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useLanguage } from "../context/LanguageContext";
 
 export const ContactSection = () => {
+    const { language } = useLanguage();
+
     const [showArrow, setShowArrow] = useState(false);
     const [lastScrollY, setLastScrollY] = useState(0);
+
+    // 🔹 Traducciones
+    const text = {
+        es: {
+            title: "Contacto",
+            description:
+                "¡Si querés trabajar conmigo o tenés alguna idea que te gustaría llevar a cabo, escribime directamente por correo o por WhatsApp!",
+            emailBtn: "📧 Enviar Email",
+        },
+        en: {
+            title: "Contact",
+            description:
+                "If you want to work with me or have an idea you'd like to bring to life, write me directly by email or WhatsApp!",
+            emailBtn: "📧 Send Email",
+        },
+    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -20,21 +39,29 @@ export const ContactSection = () => {
             id="contacto"
             className="min-h-screen bg-gradient-to-b from-black to-violet-950 flex flex-col items-center justify-center text-center px-6"
         >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Contacto
+            {/* Título */}
+            <h2
+                className="text-4xl md:text-5xl font-bold text-white mb-6"
+                style={{ textShadow: "0 0 8px rgba(0,0,0,0.6)" }}
+            >
+                {text[language].title}
             </h2>
 
-            <p className="text-purple-200 text-lg max-w-xl mb-10">
-                Si querés trabajar conmigo o tenés alguna idea que te gustaría llevar a
-                cabo, escribime directamente por correo o por WhatsApp.
+            {/* Descripción */}
+            <p
+                className="text-purple-200 text-lg max-w-xl mb-10"
+                style={{ textShadow: "0 0 6px rgba(0,0,0,0.4)" }}
+            >
+                {text[language].description}
             </p>
 
+            {/* Botones */}
             <div className="flex flex-col sm:flex-row gap-6">
                 <a
                     href="mailto:doroliva22@gmail.com"
                     className="px-8 py-3 rounded-xl bg-violet-600 text-white font-semibold hover:bg-violet-500 transition-all duration-300 shadow-lg shadow-violet-500/30"
                 >
-                    📧 Enviar Email
+                    {text[language].emailBtn}
                 </a>
 
                 <a
